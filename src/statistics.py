@@ -1,4 +1,4 @@
-from math import sqrt
+from math import ceil, sqrt
 
 import numpy as np
 from scipy.stats import t
@@ -76,6 +76,19 @@ def calculate_autocorrelations(values: np.ndarray) -> dict[int, float]:
         lag: autocorrelation(values, lag)
         for lag in AUTOCORRELATION_LAGS
     }
+
+
+def calculate_histogram(
+    values: np.ndarray,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Calculate histogram frequencies using ceil(sqrt(n)) equal-width bins."""
+    sample = np.asarray(values, dtype=float)
+    if sample.ndim != 1 or sample.size < 2:
+        raise ValueError("Для гистограммы требуется не менее двух значений.")
+
+    bin_count = ceil(sqrt(sample.size))
+    frequencies, boundaries = np.histogram(sample, bins=bin_count)
+    return boundaries, frequencies
 
 
 def confidence_key(probability: float) -> str:

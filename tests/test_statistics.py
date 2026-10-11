@@ -9,6 +9,7 @@ from src.statistics import (
     calculate_autocorrelations,
     calculate_characteristics,
     calculate_for_sample_sizes,
+    calculate_histogram,
     relative_deviation,
 )
 
@@ -69,3 +70,11 @@ def test_variant_29_autocorrelations() -> None:
 
     assert tuple(result) == tuple(range(1, 11))
     assert result[1] == pytest.approx(0.0168839649)
+
+
+def test_histogram_uses_square_root_rule() -> None:
+    boundaries, frequencies = calculate_histogram(np.arange(1.0, 301.0))
+
+    assert len(frequencies) == 18
+    assert len(boundaries) == 19
+    assert int(frequencies.sum()) == 300

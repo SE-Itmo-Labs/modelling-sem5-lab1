@@ -7,6 +7,7 @@ from pathlib import Path
 from src.data_io import load_sequence
 from src.plots import (
     save_autocorrelation_plot,
+    save_source_histogram_plot,
     save_source_sequence_plot,
     save_stage_2_summary,
 )
@@ -14,10 +15,16 @@ from src.report_tables import (
     build_form1_rows,
     save_form1,
     save_source_autocorrelations,
+    save_source_histogram,
+    save_stage_4_summary,
     save_stage_3_summary,
     save_summary,
 )
-from src.statistics import calculate_autocorrelations, calculate_for_sample_sizes
+from src.statistics import (
+    calculate_autocorrelations,
+    calculate_for_sample_sizes,
+    calculate_histogram,
+)
 
 
 def main() -> None:
@@ -63,6 +70,22 @@ def main() -> None:
     )
     save_stage_3_summary(stage_3_summary_path, autocorrelations, confidence_bound)
 
+    histogram_boundaries, histogram_frequencies = calculate_histogram(values)
+    histogram_table_path = args.out_dir / "tables" / "stage_4_histogram.csv"
+    histogram_plot_path = args.out_dir / "plots" / "source_histogram.png"
+    stage_4_summary_path = args.out_dir / "stage_4_summary.txt"
+    save_source_histogram(
+        histogram_table_path,
+        histogram_boundaries,
+        histogram_frequencies,
+    )
+    save_source_histogram_plot(histogram_plot_path, values, histogram_boundaries)
+    save_stage_4_summary(
+        stage_4_summary_path,
+        histogram_boundaries,
+        histogram_frequencies,
+    )
+
     writer = csv.writer(sys.stdout, delimiter="\t")
     writer.writerows(build_form1_rows(results))
     print(f"\nТаблица сохранена: {table_path}")
@@ -72,6 +95,9 @@ def main() -> None:
     print(f"Автокорреляции сохранены: {autocorrelation_table_path}")
     print(f"График автокорреляции сохранён: {autocorrelation_plot_path}")
     print(f"Итог третьего этапа сохранён: {stage_3_summary_path}")
+    print(f"Интервальный ряд сохранён: {histogram_table_path}")
+    print(f"Гистограмма сохранена: {histogram_plot_path}")
+    print(f"Итог четвёртого этапа сохранён: {stage_4_summary_path}")
 
 
 if __name__ == "__main__":

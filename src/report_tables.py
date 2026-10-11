@@ -147,5 +147,57 @@ def save_stage_3_summary(
     output_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
+def save_source_histogram(
+    path: str | Path,
+    boundaries: object,
+    frequencies: object,
+) -> None:
+    output_path = Path(path)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    rows = [["№", "Левая граница", "Правая граница", "Частота"]]
+    for number, (left, right, frequency) in enumerate(
+        zip(boundaries[:-1], boundaries[1:], frequencies),
+        start=1,
+    ):
+        rows.append(
+            [
+                str(number),
+                format_number(float(left)),
+                format_number(float(right)),
+                str(int(frequency)),
+            ]
+        )
+
+    with output_path.open("w", encoding="utf-8-sig", newline="") as file:
+        csv.writer(file, delimiter=";").writerows(rows)
+
+
+def save_stage_4_summary(
+    path: str | Path,
+    boundaries: object,
+    frequencies: object,
+) -> None:
+    output_path = Path(path)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    maximum_index = max(range(len(frequencies)), key=lambda index: frequencies[index])
+    lines = [
+        "Этап 4. Гистограмма распределения частот",
+        f"Количество интервалов: {len(frequencies)}",
+        f"Ширина интервала: {float(boundaries[1] - boundaries[0]):.6f}",
+        (
+            "Максимальная частота: "
+            f"{int(frequencies[maximum_index])} в интервале "
+            f"[{float(boundaries[maximum_index]):.6f}; "
+            f"{float(boundaries[maximum_index + 1]):.6f})"
+        ),
+        (
+            "Вывод: основная масса наблюдений сосредоточена в области малых "
+            "значений; распределение имеет выраженную правостороннюю "
+            "асимметрию и длинный правый хвост."
+        ),
+    ]
+    output_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
 def format_number(value: float) -> str:
     return f"{value:.6f}"

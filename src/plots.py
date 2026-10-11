@@ -74,3 +74,28 @@ def save_autocorrelation_plot(
     figure.tight_layout()
     figure.savefig(path, dpi=220, bbox_inches="tight")
     plt.close(figure)
+
+
+def save_source_histogram_plot(
+    path: Path,
+    values: np.ndarray,
+    boundaries: np.ndarray,
+) -> None:
+    """Save an absolute-frequency histogram of the source sequence."""
+    sample = np.asarray(values, dtype=float)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    figure, axis = plt.subplots(figsize=(10, 4.8))
+    axis.hist(
+        sample,
+        bins=boundaries,
+        color="#5b9bd5",
+        edgecolor="#202020",
+        linewidth=0.8,
+    )
+    axis.set_xlabel("Значение")
+    axis.set_ylabel("Частота")
+    axis.set_xlim(boundaries[0], boundaries[-1])
+    axis.grid(axis="y", alpha=0.25)
+    figure.tight_layout()
+    figure.savefig(path, dpi=220, bbox_inches="tight")
+    plt.close(figure)
