@@ -91,5 +91,17 @@ def calculate_histogram(
     return boundaries, frequencies
 
 
+def correlation_coefficient(first: np.ndarray, second: np.ndarray) -> float:
+    first_sample = np.asarray(first, dtype=float)
+    second_sample = np.asarray(second, dtype=float)
+    if first_sample.ndim != 1 or second_sample.ndim != 1:
+        raise ValueError("Последовательности должны быть одномерными.")
+    if first_sample.size != second_sample.size or first_sample.size < 2:
+        raise ValueError("Последовательности должны иметь одинаковую длину не менее 2.")
+    if np.std(first_sample) == 0 or np.std(second_sample) == 0:
+        raise ValueError("Корреляция не определена для постоянной последовательности.")
+    return float(np.corrcoef(first_sample, second_sample)[0, 1])
+
+
 def confidence_key(probability: float) -> str:
     return f"confidence_{probability:.2f}"

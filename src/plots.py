@@ -207,3 +207,129 @@ def save_generated_density_plot(
     figure.tight_layout()
     figure.savefig(path, dpi=220, bbox_inches="tight")
     plt.close(figure)
+
+
+def save_source_density_plot(
+    path: Path,
+    values: np.ndarray,
+    parameters: HyperexponentialParameters,
+) -> None:
+    """Save the normalized source histogram with the fitted H2 density."""
+    sample = np.asarray(values, dtype=float)
+    bin_count = int(np.ceil(np.sqrt(sample.size)))
+    x_values = np.linspace(0, sample.max() * 1.05, 1200)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    figure, axis = plt.subplots(figsize=(10, 4.8))
+    axis.hist(
+        sample,
+        bins=bin_count,
+        density=True,
+        color="#5b9bd5",
+        alpha=0.65,
+        edgecolor="#202020",
+        linewidth=0.8,
+        label="Исходная ЧП",
+    )
+    axis.plot(
+        x_values,
+        hyperexponential_density(x_values, parameters),
+        color="#c23b22",
+        linewidth=1.8,
+        label="Плотность H₂",
+    )
+    axis.set_xlabel("Значение")
+    axis.set_ylabel("Плотность")
+    axis.set_xlim(0, x_values[-1])
+    axis.grid(axis="y", alpha=0.25)
+    axis.legend(loc="upper right")
+    figure.tight_layout()
+    figure.savefig(path, dpi=220, bbox_inches="tight")
+    plt.close(figure)
+
+
+def save_histogram_comparison_plot(
+    path: Path,
+    source: np.ndarray,
+    generated: np.ndarray,
+) -> None:
+    """Save normalized histograms with shared interval boundaries."""
+    source_sample = np.asarray(source, dtype=float)
+    generated_sample = np.asarray(generated, dtype=float)
+    boundaries = np.linspace(
+        min(source_sample.min(), generated_sample.min()),
+        max(source_sample.max(), generated_sample.max()),
+        int(np.ceil(np.sqrt(source_sample.size))) + 1,
+    )
+    path.parent.mkdir(parents=True, exist_ok=True)
+    figure, axis = plt.subplots(figsize=(10, 4.8))
+    axis.hist(
+        source_sample,
+        bins=boundaries,
+        density=True,
+        alpha=0.5,
+        color="#2563a6",
+        edgecolor="#202020",
+        linewidth=0.7,
+        label="Исходная ЧП",
+    )
+    axis.hist(
+        generated_sample,
+        bins=boundaries,
+        density=True,
+        alpha=0.5,
+        color="#e67e22",
+        edgecolor="#202020",
+        linewidth=0.7,
+        label="Сгенерированная ЧП",
+    )
+    axis.set_xlabel("Значение")
+    axis.set_ylabel("Плотность")
+    axis.grid(axis="y", alpha=0.25)
+    axis.legend(loc="upper right")
+    figure.tight_layout()
+    figure.savefig(path, dpi=220, bbox_inches="tight")
+    plt.close(figure)
+
+
+def save_sequence_comparison_plot(
+    path: Path,
+    source: np.ndarray,
+    generated: np.ndarray,
+) -> None:
+    numbers = np.arange(1, len(source) + 1)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    figure, axis = plt.subplots(figsize=(10, 4.8))
+    axis.plot(numbers, source, linewidth=1.0, alpha=0.8, label="Исходная ЧП")
+    axis.plot(numbers, generated, linewidth=1.0, alpha=0.8, label="Сгенерированная ЧП")
+    axis.set_xlabel("Номер значения")
+    axis.set_ylabel("Значение")
+    axis.set_xlim(1, len(source))
+    axis.set_ylim(bottom=0)
+    axis.grid(True, alpha=0.25)
+    axis.legend(loc="upper left")
+    figure.tight_layout()
+    figure.savefig(path, dpi=220, bbox_inches="tight")
+    plt.close(figure)
+
+
+def save_autocorrelation_comparison_plot(
+    path: Path,
+    source: dict[int, float],
+    generated: dict[int, float],
+) -> None:
+    lags = np.asarray(AUTOCORRELATION_LAGS)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    figure, axis = plt.subplots(figsize=(10, 4.8))
+    axis.plot(lags, [source[lag] for lag in lags], linewidth=1.5, label="Исходная ЧП")
+    axis.plot(lags, [generated[lag] for lag in lags], linewidth=1.5, label="Сгенерированная ЧП")
+    axis.axhline(0, color="#202020", linewidth=0.8)
+    axis.set_xlabel("Сдвиг")
+    axis.set_ylabel("Коэффициент автокорреляции")
+    axis.set_xticks(lags)
+    axis.set_xlim(0.5, 10.5)
+    axis.set_ylim(-0.15, 0.15)
+    axis.grid(True, alpha=0.25)
+    axis.legend(loc="lower right")
+    figure.tight_layout()
+    figure.savefig(path, dpi=220, bbox_inches="tight")
+    plt.close(figure)

@@ -10,6 +10,7 @@ from src.statistics import (
     calculate_characteristics,
     calculate_for_sample_sizes,
     calculate_histogram,
+    correlation_coefficient,
     relative_deviation,
 )
 
@@ -78,3 +79,10 @@ def test_histogram_uses_square_root_rule() -> None:
     assert len(frequencies) == 18
     assert len(boundaries) == 19
     assert int(frequencies.sum()) == 300
+
+
+def test_correlation_coefficient() -> None:
+    first = np.array([1.0, 2.0, 3.0, 4.0])
+
+    assert correlation_coefficient(first, first) == pytest.approx(1.0)
+    assert correlation_coefficient(first, first[::-1]) == pytest.approx(-1.0)

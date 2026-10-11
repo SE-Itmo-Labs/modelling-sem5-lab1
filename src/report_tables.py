@@ -166,6 +166,58 @@ def save_generated_autocorrelations(
         csv.writer(file, delimiter=";").writerows(rows)
 
 
+def save_form3(
+    path: str | Path,
+    source: dict[int, float],
+    generated: dict[int, float],
+    small_reference: float = 0.01,
+) -> None:
+    output_path = Path(path)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    deviations = []
+    for lag in AUTOCORRELATION_LAGS:
+        if abs(source[lag]) < small_reference:
+            deviations.append("—")
+        else:
+            deviations.append(
+                format_number(relative_deviation(generated[lag], source[lag]))
+            )
+    rows = [
+        ["Сдвиг ЧП", *map(str, AUTOCORRELATION_LAGS)],
+        ["К-т АК для задан. ЧП", *(format_number(source[lag]) for lag in AUTOCORRELATION_LAGS)],
+        ["К-т АК для сгенер. ЧП", *(format_number(generated[lag]) for lag in AUTOCORRELATION_LAGS)],
+        ["Отклонение, %", *deviations],
+    ]
+    with output_path.open("w", encoding="utf-8-sig", newline="") as file:
+        csv.writer(file, delimiter=";").writerows(rows)
+
+
+def save_final_summary(
+    path: str | Path,
+    source: dict[str, float],
+    generated: dict[str, float],
+    correlation: float,
+    seed: int,
+) -> None:
+    output_path = Path(path)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    lines = [
+        "Итоговое сравнение исходной и сгенерированной последовательностей",
+        f"Seed: {seed}",
+        f"Корреляция Пирсона: {correlation:.6f}",
+        f"Отклонение среднего: {relative_deviation(generated['mean'], source['mean']):.6f}%",
+        f"Отклонение дисперсии: {relative_deviation(generated['variance'], source['variance']):.6f}%",
+        f"Отклонение СКО: {relative_deviation(generated['standard_deviation'], source['standard_deviation']):.6f}%",
+        f"Отклонение коэффициента вариации: {relative_deviation(generated['coefficient_of_variation'], source['coefficient_of_variation']):.6f}%",
+        (
+            "Вывод: модель воспроизводит среднее, правостороннюю форму и "
+            "случайный характер исходных данных; различия дисперсии связаны "
+            "с конечным объёмом реализации."
+        ),
+    ]
+    output_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
 def save_stage_3_summary(
     path: str | Path,
     values: dict[int, float],
