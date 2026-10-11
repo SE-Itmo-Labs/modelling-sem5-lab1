@@ -8,6 +8,10 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.patches import FancyBboxPatch
 
+from src.hyperexponential import (
+    HyperexponentialParameters,
+    hyperexponential_density,
+)
 from src.statistics import AUTOCORRELATION_LAGS
 
 
@@ -147,4 +151,59 @@ def save_generator_algorithm_plot(path: Path) -> None:
 
     figure.tight_layout()
     figure.savefig(path, dpi=220, bbox_inches="tight", facecolor="white")
+    plt.close(figure)
+
+
+def save_generated_sequence_plot(path: Path, values: np.ndarray) -> None:
+    """Save the generated sequence in observation order."""
+    sample = np.asarray(values, dtype=float)
+    numbers = np.arange(1, sample.size + 1)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    figure, axis = plt.subplots(figsize=(10, 4.8))
+    axis.plot(numbers, sample, color="#2563a6", linewidth=1.0)
+    axis.set_xlabel("Номер значения")
+    axis.set_ylabel("Значение")
+    axis.set_xlim(1, sample.size)
+    axis.set_ylim(bottom=0)
+    axis.grid(True, alpha=0.25)
+    figure.tight_layout()
+    figure.savefig(path, dpi=220, bbox_inches="tight")
+    plt.close(figure)
+
+
+def save_generated_density_plot(
+    path: Path,
+    values: np.ndarray,
+    parameters: HyperexponentialParameters,
+) -> None:
+    """Save a normalized generated histogram with the fitted H2 density."""
+    sample = np.asarray(values, dtype=float)
+    bin_count = int(np.ceil(np.sqrt(sample.size)))
+    x_values = np.linspace(0, sample.max() * 1.08, 1200)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    figure, axis = plt.subplots(figsize=(10, 4.8))
+    axis.hist(
+        sample,
+        bins=bin_count,
+        density=True,
+        color="#5b9bd5",
+        alpha=0.65,
+        edgecolor="#202020",
+        linewidth=0.8,
+        label="Сгенерированная ЧП",
+    )
+    axis.plot(
+        x_values,
+        hyperexponential_density(x_values, parameters),
+        color="#c23b22",
+        linewidth=1.8,
+        label="Плотность H₂",
+    )
+    axis.set_xlabel("Значение")
+    axis.set_ylabel("Плотность")
+    axis.set_xlim(0, x_values[-1])
+    axis.grid(axis="y", alpha=0.25)
+    axis.legend(loc="upper right")
+    figure.tight_layout()
+    figure.savefig(path, dpi=220, bbox_inches="tight")
     plt.close(figure)

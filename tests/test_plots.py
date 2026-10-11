@@ -5,6 +5,8 @@ import numpy as np
 from src.plots import (
     save_autocorrelation_plot,
     save_generator_algorithm_plot,
+    save_generated_density_plot,
+    save_generated_sequence_plot,
     save_source_histogram_plot,
     save_source_sequence_plot,
 )
@@ -47,3 +49,18 @@ def test_generator_algorithm_plot_is_saved(tmp_path: Path) -> None:
 
     assert path.is_file()
     assert path.stat().st_size > 0
+
+
+def test_generated_plots_are_saved(tmp_path: Path) -> None:
+    from src.hyperexponential import HyperexponentialParameters
+
+    values = np.linspace(0.1, 20.0, 300)
+    parameters = HyperexponentialParameters(0.25, 12.0, 3.0)
+    sequence_path = tmp_path / "generated_sequence.png"
+    density_path = tmp_path / "generated_density.png"
+
+    save_generated_sequence_plot(sequence_path, values)
+    save_generated_density_plot(density_path, values, parameters)
+
+    assert sequence_path.stat().st_size > 0
+    assert density_path.stat().st_size > 0

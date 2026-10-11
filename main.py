@@ -15,18 +15,23 @@ from src.hyperexponential import (
 from src.plots import (
     save_autocorrelation_plot,
     save_generator_algorithm_plot,
+    save_generated_density_plot,
+    save_generated_sequence_plot,
     save_source_histogram_plot,
     save_source_sequence_plot,
     save_stage_2_summary,
 )
 from src.report_tables import (
     build_form1_rows,
+    save_form2,
+    save_generated_autocorrelations,
     save_form1,
     save_source_autocorrelations,
     save_source_histogram,
     save_stage_4_summary,
     save_stage_5_summary,
     save_stage_6_summary,
+    save_stage_7_summary,
     save_stage_3_summary,
     save_summary,
 )
@@ -130,6 +135,41 @@ def main() -> None:
     save_generator_algorithm_plot(generator_algorithm_path)
     save_stage_6_summary(stage_6_summary_path, generated_values, args.seed)
 
+    generated_results = calculate_for_sample_sizes(generated_values)
+    form_2_path = args.out_dir / "tables" / "stage_7_form2.csv"
+    generated_sequence_plot_path = args.out_dir / "plots" / "generated_sequence.png"
+    generated_density_plot_path = args.out_dir / "plots" / "generated_density.png"
+    generated_autocorrelation_plot_path = (
+        args.out_dir / "plots" / "generated_autocorrelation.png"
+    )
+    generated_autocorrelation_table_path = (
+        args.out_dir / "tables" / "stage_7_autocorrelation.csv"
+    )
+    generated_autocorrelations = calculate_autocorrelations(generated_values)
+    stage_7_summary_path = args.out_dir / "stage_7_summary.txt"
+    save_form2(form_2_path, generated_results, results)
+    save_generated_sequence_plot(generated_sequence_plot_path, generated_values)
+    save_generated_density_plot(
+        generated_density_plot_path,
+        generated_values,
+        hyperexponential_parameters,
+    )
+    save_autocorrelation_plot(
+        generated_autocorrelation_plot_path,
+        generated_autocorrelations,
+    )
+    save_generated_autocorrelations(
+        generated_autocorrelation_table_path,
+        generated_autocorrelations,
+    )
+    save_stage_7_summary(
+        stage_7_summary_path,
+        results[300],
+        generated_results[300],
+        generated_autocorrelations,
+        confidence_bound,
+    )
+
     writer = csv.writer(sys.stdout, delimiter="\t")
     writer.writerows(build_form1_rows(results))
     print(f"\nТаблица сохранена: {table_path}")
@@ -146,6 +186,12 @@ def main() -> None:
     print(f"Сгенерированная последовательность сохранена: {generated_path}")
     print(f"Алгоритм генерации сохранён: {generator_algorithm_path}")
     print(f"Итог шестого этапа сохранён: {stage_6_summary_path}")
+    print(f"Форма 2 сохранена: {form_2_path}")
+    print(f"График сгенерированной ЧП сохранён: {generated_sequence_plot_path}")
+    print(f"Гистограмма и плотность H2 сохранены: {generated_density_plot_path}")
+    print(f"Автокорреляция сгенерированной ЧП сохранена: {generated_autocorrelation_plot_path}")
+    print(f"Таблица автокорреляции сгенерированной ЧП сохранена: {generated_autocorrelation_table_path}")
+    print(f"Итог седьмого этапа сохранён: {stage_7_summary_path}")
 
 
 if __name__ == "__main__":

@@ -5,6 +5,7 @@ from src.hyperexponential import (
     empirical_moments,
     fit_hyperexponential,
     generate_hyperexponential,
+    hyperexponential_density,
     theoretical_moments,
 )
 
@@ -43,3 +44,14 @@ def test_h2_generator_is_reproducible_and_nonnegative() -> None:
     assert len(first) == 300
     assert np.all(np.isfinite(first))
     assert np.all(first >= 0)
+
+
+def test_h2_density_is_positive_and_decreasing() -> None:
+    parameters = fit_hyperexponential(
+        np.array([1.0, 1.0, 1.0, 10.0]),
+        probability=0.25,
+    )
+    density = hyperexponential_density(np.array([0.0, 1.0, 2.0]), parameters)
+
+    assert np.all(density > 0)
+    assert np.all(np.diff(density) < 0)

@@ -90,6 +90,20 @@ def theoretical_moments(
     }
 
 
+def hyperexponential_density(
+    values: np.ndarray,
+    parameters: HyperexponentialParameters,
+) -> np.ndarray:
+    sample = np.asarray(values, dtype=float)
+    q = parameters.probability
+    t_1 = parameters.phase_1_mean
+    t_2 = parameters.phase_2_mean
+    return (
+        q / t_1 * np.exp(-sample / t_1)
+        + (1 - q) / t_2 * np.exp(-sample / t_2)
+    )
+
+
 def generate_hyperexponential(
     parameters: HyperexponentialParameters,
     size: int,

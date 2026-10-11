@@ -52,6 +52,39 @@ def save_form1(
         writer.writerows(build_form1_rows(results))
 
 
+def build_form2_rows(
+    generated: dict[int, dict[str, float]],
+    source: dict[int, dict[str, float]],
+) -> list[list[str]]:
+    rows = [["Характеристика", "Показатель", *map(str, SAMPLE_SIZES)]]
+    for title, key, is_interval in ROWS:
+        values = [generated[size][key] for size in SAMPLE_SIZES]
+        references = [source[size][key] for size in SAMPLE_SIZES]
+        formatted_values = [format_number(value) for value in values]
+        if is_interval:
+            formatted_values = [f"±{value}" for value in formatted_values]
+        deviations = [
+            format_number(relative_deviation(value, reference))
+            for value, reference in zip(values, references)
+        ]
+        rows.append([title, "Знач.", *formatted_values])
+        rows.append([title, "%", *deviations])
+    return rows
+
+
+def save_form2(
+    path: str | Path,
+    generated: dict[int, dict[str, float]],
+    source: dict[int, dict[str, float]],
+) -> None:
+    output_path = Path(path)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    with output_path.open("w", encoding="utf-8-sig", newline="") as file:
+        csv.writer(file, delimiter=";").writerows(
+            build_form2_rows(generated, source)
+        )
+
+
 def save_summary(
     path: str | Path,
     results: dict[int, dict[str, float]],
@@ -109,6 +142,23 @@ def save_source_autocorrelations(
         ["Сдвиг ЧП", *map(str, AUTOCORRELATION_LAGS)],
         [
             "К-т АК для задан. ЧП",
+            *(format_number(values[lag]) for lag in AUTOCORRELATION_LAGS),
+        ],
+    ]
+    with output_path.open("w", encoding="utf-8-sig", newline="") as file:
+        csv.writer(file, delimiter=";").writerows(rows)
+
+
+def save_generated_autocorrelations(
+    path: str | Path,
+    values: dict[int, float],
+) -> None:
+    output_path = Path(path)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    rows = [
+        ["Сдвиг ЧП", *map(str, AUTOCORRELATION_LAGS)],
+        [
+            "К-т АК для сгенер. ЧП",
             *(format_number(values[lag]) for lag in AUTOCORRELATION_LAGS),
         ],
     ]
@@ -245,6 +295,43 @@ def save_stage_6_summary(
         f"Минимальное значение: {float(min(values)):.6f}",
         f"Максимальное значение: {float(max(values)):.6f}",
         "Все значения конечны и неотрицательны.",
+    ]
+    output_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
+def save_stage_7_summary(
+    path: str | Path,
+    source: dict[str, float],
+    generated: dict[str, float],
+    autocorrelations: dict[int, float],
+    confidence_bound: float,
+) -> None:
+    output_path = Path(path)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    maximum_lag = max(autocorrelations, key=lambda lag: abs(autocorrelations[lag]))
+    significant_lags = [
+        lag
+        for lag, value in autocorrelations.items()
+        if abs(value) > confidence_bound
+    ]
+    lines = [
+        "Этап 7. Исследование сгенерированной последовательности",
+        f"Среднее: {generated['mean']:.6f}",
+        f"Отклонение среднего: {relative_deviation(generated['mean'], source['mean']):.6f}%",
+        f"Дисперсия: {generated['variance']:.6f}",
+        f"Отклонение дисперсии: {relative_deviation(generated['variance'], source['variance']):.6f}%",
+        f"СКО: {generated['standard_deviation']:.6f}",
+        f"Отклонение СКО: {relative_deviation(generated['standard_deviation'], source['standard_deviation']):.6f}%",
+        f"Коэффициент вариации: {generated['coefficient_of_variation']:.6f}",
+        f"Отклонение коэффициента вариации: {relative_deviation(generated['coefficient_of_variation'], source['coefficient_of_variation']):.6f}%",
+        (
+            "Максимальная по модулю автокорреляция: "
+            f"r({maximum_lag}) = {autocorrelations[maximum_lag]:.6f}"
+        ),
+        (
+            "Сдвиги за ориентировочными границами: "
+            + ("нет" if not significant_lags else ", ".join(map(str, significant_lags)))
+        ),
     ]
     output_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
