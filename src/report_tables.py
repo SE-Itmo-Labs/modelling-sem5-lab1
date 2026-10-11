@@ -66,9 +66,9 @@ def save_summary(
         f"Дисперсия: {format_number(values['variance'])}",
         f"Среднеквадратическое отклонение: {format_number(values['standard_deviation'])}",
         f"Коэффициент вариации: {format_number(values['coefficient_of_variation'])}",
-        f"Полуширина доверительного интервала 0,90: ±{format_number(values['confidence_0.90'])}",
-        f"Полуширина доверительного интервала 0,95: ±{format_number(values['confidence_0.95'])}",
-        f"Полуширина доверительного интервала 0,99: ±{format_number(values['confidence_0.99'])}",
+        f"Полуширина ДИ 0,90: +-{format_number(values['confidence_0.90'])}",
+        f"Полуширина ДИ 0,95: +-{format_number(values['confidence_0.95'])}",
+        f"Полуширина ДИ 0,99: +-{format_number(values['confidence_0.99'])}",
         "",
         "Вывод",
         (

@@ -29,8 +29,8 @@ def main() -> None:
     values = load_sequence(args.input)
     results = calculate_for_sample_sizes(values)
 
-    table_path = args.out_dir / "tables" / "form1.csv"
-    summary_path = args.out_dir / "stage1_summary.txt"
+    table_path = args.out_dir / "tables" / "stage_1_data.csv"
+    summary_path = args.out_dir / "stage_1_summary.txt"
     save_form1(table_path, results)
     save_summary(summary_path, results)
 
