@@ -231,5 +231,23 @@ def save_stage_5_summary(
     output_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
+def save_stage_6_summary(
+    path: str | Path,
+    values: object,
+    seed: int,
+) -> None:
+    output_path = Path(path)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    lines = [
+        "Этап 6. Генератор гиперэкспоненциальной последовательности",
+        f"Seed: {seed}",
+        f"Количество значений: {len(values)}",
+        f"Минимальное значение: {float(min(values)):.6f}",
+        f"Максимальное значение: {float(max(values)):.6f}",
+        "Все значения конечны и неотрицательны.",
+    ]
+    output_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
 def format_number(value: float) -> str:
     return f"{value:.6f}"

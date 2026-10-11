@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from math import sqrt
+from pathlib import Path
 
 import numpy as np
 
@@ -87,3 +88,38 @@ def theoretical_moments(
         "variance": variance,
         "coefficient_of_variation": sqrt(variance) / mean,
     }
+
+
+def generate_hyperexponential(
+    parameters: HyperexponentialParameters,
+    size: int,
+    seed: int,
+) -> np.ndarray:
+    """Generate an H2 sample by phase selection and inverse transformation."""
+    if size < 1:
+        raise ValueError("Размер последовательности должен быть положительным.")
+
+    generator = np.random.default_rng(seed)
+    phase_uniforms = generator.random(size)
+    value_uniforms = generator.random(size)
+    phase_means = np.where(
+        phase_uniforms < parameters.probability,
+        parameters.phase_1_mean,
+        parameters.phase_2_mean,
+    )
+    return -phase_means * np.log1p(-value_uniforms)
+
+
+def save_generated_sequence(
+    path: str | Path,
+    values: np.ndarray,
+    parameters: HyperexponentialParameters,
+    seed: int,
+) -> None:
+    output_path = Path(path)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    header = (
+        f"seed={seed}; q={parameters.probability:.6f}; "
+        f"t1={parameters.phase_1_mean:.6f}; t2={parameters.phase_2_mean:.6f}"
+    )
+    np.savetxt(output_path, values, fmt="%.10f", header=header, encoding="utf-8")

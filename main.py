@@ -8,10 +8,13 @@ from src.data_io import load_sequence
 from src.hyperexponential import (
     empirical_moments,
     fit_hyperexponential,
+    generate_hyperexponential,
+    save_generated_sequence,
     theoretical_moments,
 )
 from src.plots import (
     save_autocorrelation_plot,
+    save_generator_algorithm_plot,
     save_source_histogram_plot,
     save_source_sequence_plot,
     save_stage_2_summary,
@@ -23,6 +26,7 @@ from src.report_tables import (
     save_source_histogram,
     save_stage_4_summary,
     save_stage_5_summary,
+    save_stage_6_summary,
     save_stage_3_summary,
     save_summary,
 )
@@ -48,6 +52,12 @@ def main() -> None:
         type=Path,
         default=Path("results"),
         help="Каталог для результатов.",
+    )
+    parser.add_argument(
+        "--seed",
+        type=int,
+        default=29,
+        help="Seed генератора гиперэкспоненциальной последовательности.",
     )
     args = parser.parse_args()
 
@@ -103,6 +113,23 @@ def main() -> None:
         theoretical,
     )
 
+    generated_values = generate_hyperexponential(
+        hyperexponential_parameters,
+        size=len(values),
+        seed=args.seed,
+    )
+    generated_path = args.out_dir / "generated.txt"
+    generator_algorithm_path = args.out_dir / "plots" / "generator_algorithm.png"
+    stage_6_summary_path = args.out_dir / "stage_6_summary.txt"
+    save_generated_sequence(
+        generated_path,
+        generated_values,
+        hyperexponential_parameters,
+        args.seed,
+    )
+    save_generator_algorithm_plot(generator_algorithm_path)
+    save_stage_6_summary(stage_6_summary_path, generated_values, args.seed)
+
     writer = csv.writer(sys.stdout, delimiter="\t")
     writer.writerows(build_form1_rows(results))
     print(f"\nТаблица сохранена: {table_path}")
@@ -116,6 +143,9 @@ def main() -> None:
     print(f"Гистограмма сохранена: {histogram_plot_path}")
     print(f"Итог четвёртого этапа сохранён: {stage_4_summary_path}")
     print(f"Параметры аппроксимирующего закона сохранены: {stage_5_summary_path}")
+    print(f"Сгенерированная последовательность сохранена: {generated_path}")
+    print(f"Алгоритм генерации сохранён: {generator_algorithm_path}")
+    print(f"Итог шестого этапа сохранён: {stage_6_summary_path}")
 
 
 if __name__ == "__main__":

@@ -6,6 +6,7 @@ import numpy as np
 matplotlib.use("Agg")
 
 import matplotlib.pyplot as plt
+from matplotlib.patches import FancyBboxPatch
 
 from src.statistics import AUTOCORRELATION_LAGS
 
@@ -98,4 +99,52 @@ def save_source_histogram_plot(
     axis.grid(axis="y", alpha=0.25)
     figure.tight_layout()
     figure.savefig(path, dpi=220, bbox_inches="tight")
+    plt.close(figure)
+
+
+def save_generator_algorithm_plot(path: Path) -> None:
+    """Save a compact flowchart of the H2 generation algorithm."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    figure, axis = plt.subplots(figsize=(7, 8.5))
+    axis.set_xlim(0, 10)
+    axis.set_ylim(0, 14)
+    axis.axis("off")
+
+    steps = (
+        (12.7, "Начало", 2.6),
+        (10.9, "Задать q, t₁, t₂, seed и n = 300", 6.8),
+        (9.1, "Сгенерировать U₀, U₁ ∈ (0; 1)", 6.8),
+        (7.3, "t = t₁, если U₀ < q; иначе t = t₂", 7.4),
+        (5.5, "Xᵢ = −t · ln(1 − U₁)", 5.8),
+        (3.7, "Повторить для i = 1, …, 300", 6.2),
+        (1.9, "Сохранить последовательность", 5.6),
+        (0.4, "Конец", 2.6),
+    )
+    for y, label, width in steps:
+        height = 0.9
+        left = 5 - width / 2
+        box = FancyBboxPatch(
+            (left, y),
+            width,
+            height,
+            boxstyle="round,pad=0.08,rounding_size=0.12",
+            facecolor="#edf4fb",
+            edgecolor="#2563a6",
+            linewidth=1.4,
+        )
+        axis.add_patch(box)
+        axis.text(5, y + height / 2, label, ha="center", va="center", fontsize=10)
+
+    for current, following in zip(steps[:-1], steps[1:]):
+        current_y = current[0]
+        following_y = following[0]
+        axis.annotate(
+            "",
+            xy=(5, following_y + 0.95),
+            xytext=(5, current_y),
+            arrowprops={"arrowstyle": "->", "color": "#202020", "linewidth": 1.2},
+        )
+
+    figure.tight_layout()
+    figure.savefig(path, dpi=220, bbox_inches="tight", facecolor="white")
     plt.close(figure)

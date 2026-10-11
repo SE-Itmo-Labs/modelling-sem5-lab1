@@ -4,6 +4,7 @@ import pytest
 from src.hyperexponential import (
     empirical_moments,
     fit_hyperexponential,
+    generate_hyperexponential,
     theoretical_moments,
 )
 
@@ -27,3 +28,18 @@ def test_h2_rejects_probability_outside_admissible_range() -> None:
 
     with pytest.raises(ValueError, match="не больше"):
         fit_hyperexponential(values, probability=0.9)
+
+
+def test_h2_generator_is_reproducible_and_nonnegative() -> None:
+    parameters = fit_hyperexponential(
+        np.array([1.0, 1.0, 1.0, 10.0]),
+        probability=0.25,
+    )
+
+    first = generate_hyperexponential(parameters, size=300, seed=29)
+    second = generate_hyperexponential(parameters, size=300, seed=29)
+
+    assert np.array_equal(first, second)
+    assert len(first) == 300
+    assert np.all(np.isfinite(first))
+    assert np.all(first >= 0)

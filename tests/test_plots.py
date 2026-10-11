@@ -4,6 +4,7 @@ import numpy as np
 
 from src.plots import (
     save_autocorrelation_plot,
+    save_generator_algorithm_plot,
     save_source_histogram_plot,
     save_source_sequence_plot,
 )
@@ -34,6 +35,15 @@ def test_histogram_plot_is_saved(tmp_path: Path) -> None:
     boundaries = np.linspace(1.0, 21.0, 6)
 
     save_source_histogram_plot(path, values, boundaries)
+
+    assert path.is_file()
+    assert path.stat().st_size > 0
+
+
+def test_generator_algorithm_plot_is_saved(tmp_path: Path) -> None:
+    path = tmp_path / "generator_algorithm.png"
+
+    save_generator_algorithm_plot(path)
 
     assert path.is_file()
     assert path.stat().st_size > 0
