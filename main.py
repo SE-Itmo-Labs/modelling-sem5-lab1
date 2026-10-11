@@ -5,6 +5,11 @@ from math import sqrt
 from pathlib import Path
 
 from src.data_io import load_sequence
+from src.hyperexponential import (
+    empirical_moments,
+    fit_hyperexponential,
+    theoretical_moments,
+)
 from src.plots import (
     save_autocorrelation_plot,
     save_source_histogram_plot,
@@ -17,6 +22,7 @@ from src.report_tables import (
     save_source_autocorrelations,
     save_source_histogram,
     save_stage_4_summary,
+    save_stage_5_summary,
     save_stage_3_summary,
     save_summary,
 )
@@ -86,6 +92,17 @@ def main() -> None:
         histogram_frequencies,
     )
 
+    empirical = empirical_moments(values)
+    hyperexponential_parameters = fit_hyperexponential(values)
+    theoretical = theoretical_moments(hyperexponential_parameters)
+    stage_5_summary_path = args.out_dir / "stage_5_summary.txt"
+    save_stage_5_summary(
+        stage_5_summary_path,
+        empirical,
+        hyperexponential_parameters,
+        theoretical,
+    )
+
     writer = csv.writer(sys.stdout, delimiter="\t")
     writer.writerows(build_form1_rows(results))
     print(f"\nТаблица сохранена: {table_path}")
@@ -98,6 +115,7 @@ def main() -> None:
     print(f"Интервальный ряд сохранён: {histogram_table_path}")
     print(f"Гистограмма сохранена: {histogram_plot_path}")
     print(f"Итог четвёртого этапа сохранён: {stage_4_summary_path}")
+    print(f"Параметры аппроксимирующего закона сохранены: {stage_5_summary_path}")
 
 
 if __name__ == "__main__":

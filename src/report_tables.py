@@ -1,6 +1,7 @@
 import csv
 from pathlib import Path
 
+from src.hyperexponential import HyperexponentialParameters
 from src.statistics import AUTOCORRELATION_LAGS, SAMPLE_SIZES, relative_deviation
 
 
@@ -195,6 +196,37 @@ def save_stage_4_summary(
             "значений; распределение имеет выраженную правостороннюю "
             "асимметрию и длинный правый хвост."
         ),
+    ]
+    output_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
+def save_stage_5_summary(
+    path: str | Path,
+    empirical: dict[str, float],
+    parameters: HyperexponentialParameters,
+    theoretical: dict[str, float],
+) -> None:
+    output_path = Path(path)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    maximum_probability = 2 / (
+        1 + empirical["coefficient_of_variation"] ** 2
+    )
+    lines = [
+        "Этап 5. Параметры гиперэкспоненциального распределения H2",
+        f"Эмпирическое среднее: {empirical['mean']:.6f}",
+        f"Эмпирический второй начальный момент: {empirical['second_raw_moment']:.6f}",
+        f"Моментная дисперсия: {empirical['variance']:.6f}",
+        f"Моментный коэффициент вариации: {empirical['coefficient_of_variation']:.6f}",
+        f"Допустимая верхняя граница q: {maximum_probability:.6f}",
+        f"Выбранная вероятность q: {parameters.probability:.6f}",
+        f"Среднее первой фазы t1: {parameters.phase_1_mean:.6f}",
+        f"Среднее второй фазы t2: {parameters.phase_2_mean:.6f}",
+        f"Интенсивность первой фазы lambda1: {parameters.phase_1_rate:.6f}",
+        f"Интенсивность второй фазы lambda2: {parameters.phase_2_rate:.6f}",
+        f"Теоретическое среднее H2: {theoretical['mean']:.6f}",
+        f"Теоретический второй начальный момент H2: {theoretical['second_raw_moment']:.6f}",
+        f"Теоретическая дисперсия H2: {theoretical['variance']:.6f}",
+        f"Теоретический коэффициент вариации H2: {theoretical['coefficient_of_variation']:.6f}",
     ]
     output_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
