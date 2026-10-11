@@ -7,6 +7,8 @@ matplotlib.use("Agg")
 
 import matplotlib.pyplot as plt
 
+from src.statistics import AUTOCORRELATION_LAGS
+
 
 def save_source_sequence_plot(path: Path, values: np.ndarray) -> None:
     """Save a plot of the source sequence."""
@@ -49,3 +51,26 @@ def save_stage_2_summary(path: Path, values: np.ndarray) -> None:
         "явная периодичность по графику не обнаружена.\n",
         encoding="utf-8",
     )
+
+
+def save_autocorrelation_plot(
+    path: Path,
+    values: dict[int, float],
+) -> None:
+    """Save source-sequence autocorrelations for lags 1 through 10."""
+    lags = np.asarray(AUTOCORRELATION_LAGS)
+    coefficients = np.asarray([values[lag] for lag in lags])
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    figure, axis = plt.subplots(figsize=(10, 4.8))
+    axis.plot(lags, coefficients, color="#2563a6", linewidth=1.5)
+    axis.axhline(0, color="#202020", linewidth=0.8)
+    axis.set_xlabel("Сдвиг")
+    axis.set_ylabel("Коэффициент автокорреляции")
+    axis.set_xticks(lags)
+    axis.set_xlim(0.5, 10.5)
+    axis.set_ylim(-0.15, 0.15)
+    axis.grid(True, alpha=0.25)
+    figure.tight_layout()
+    figure.savefig(path, dpi=220, bbox_inches="tight")
+    plt.close(figure)

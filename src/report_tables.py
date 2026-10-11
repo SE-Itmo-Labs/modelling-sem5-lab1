@@ -1,7 +1,7 @@
 import csv
 from pathlib import Path
 
-from src.statistics import SAMPLE_SIZES, relative_deviation
+from src.statistics import AUTOCORRELATION_LAGS, SAMPLE_SIZES, relative_deviation
 
 
 ROWS = (
@@ -93,6 +93,55 @@ def save_summary(
             f"{format_number(values['coefficient_of_variation'])}. Он больше "
             "единицы, что указывает на большой разброс значений относительно "
             "среднего."
+        ),
+    ]
+    output_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
+def save_source_autocorrelations(
+    path: str | Path,
+    values: dict[int, float],
+) -> None:
+    output_path = Path(path)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    rows = [
+        ["Сдвиг ЧП", *map(str, AUTOCORRELATION_LAGS)],
+        [
+            "К-т АК для задан. ЧП",
+            *(format_number(values[lag]) for lag in AUTOCORRELATION_LAGS),
+        ],
+    ]
+    with output_path.open("w", encoding="utf-8-sig", newline="") as file:
+        csv.writer(file, delimiter=";").writerows(rows)
+
+
+def save_stage_3_summary(
+    path: str | Path,
+    values: dict[int, float],
+    confidence_bound: float,
+) -> None:
+    output_path = Path(path)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    maximum_lag = max(values, key=lambda lag: abs(values[lag]))
+    significant_lags = [
+        lag for lag, value in values.items() if abs(value) > confidence_bound
+    ]
+    significance = (
+        "нет" if not significant_lags else ", ".join(map(str, significant_lags))
+    )
+    lines = [
+        "Этап 3. Автокорреляционный анализ",
+        f"Ориентировочные границы: ±{confidence_bound:.6f}",
+        (
+            "Максимальный по модулю коэффициент: "
+            f"r({maximum_lag}) = {values[maximum_lag]:.6f}"
+        ),
+        f"Сдвиги за границами: {significance}",
+        (
+            "Вывод: статистически заметная автокорреляция на сдвигах 1-10 "
+            "не обнаружена; последовательность можно считать случайной."
+            if not significant_lags
+            else "Вывод: обнаружены коэффициенты за ориентировочными границами."
         ),
     ]
     output_path.write_text("\n".join(lines) + "\n", encoding="utf-8")

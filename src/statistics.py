@@ -6,6 +6,7 @@ from scipy.stats import t
 
 SAMPLE_SIZES = (10, 20, 50, 100, 200, 300)
 CONFIDENCE_LEVELS = (0.90, 0.95, 0.99)
+AUTOCORRELATION_LAGS = tuple(range(1, 11))
 
 
 def calculate_characteristics(values: np.ndarray) -> dict[str, float]:
@@ -51,6 +52,30 @@ def relative_deviation(value: float, reference: float) -> float:
     if reference == 0:
         raise ValueError("Нельзя рассчитать отклонение от нулевого значения.")
     return abs(value - reference) / abs(reference) * 100
+
+
+def autocorrelation(values: np.ndarray, lag: int) -> float:
+    """Calculate sample autocorrelation for a positive lag."""
+    sample = np.asarray(values, dtype=float)
+    if sample.ndim != 1 or sample.size < 2:
+        raise ValueError("Для автокорреляции требуется не менее двух значений.")
+    if lag < 1 or lag >= sample.size:
+        raise ValueError("Сдвиг должен быть от 1 до n - 1.")
+
+    centered = sample - np.mean(sample)
+    denominator = float(np.sum(centered**2))
+    if denominator == 0:
+        raise ValueError("Автокорреляция не определена для постоянной выборки.")
+
+    numerator = float(np.sum(centered[:-lag] * centered[lag:]))
+    return numerator / denominator
+
+
+def calculate_autocorrelations(values: np.ndarray) -> dict[int, float]:
+    return {
+        lag: autocorrelation(values, lag)
+        for lag in AUTOCORRELATION_LAGS
+    }
 
 
 def confidence_key(probability: float) -> str:

@@ -1,12 +1,23 @@
 import argparse
 import csv
 import sys
+from math import sqrt
 from pathlib import Path
 
 from src.data_io import load_sequence
-from src.plots import save_source_sequence_plot, save_stage_2_summary
-from src.report_tables import build_form1_rows, save_form1, save_summary
-from src.statistics import calculate_for_sample_sizes
+from src.plots import (
+    save_autocorrelation_plot,
+    save_source_sequence_plot,
+    save_stage_2_summary,
+)
+from src.report_tables import (
+    build_form1_rows,
+    save_form1,
+    save_source_autocorrelations,
+    save_stage_3_summary,
+    save_summary,
+)
+from src.statistics import calculate_autocorrelations, calculate_for_sample_sizes
 
 
 def main() -> None:
@@ -40,12 +51,27 @@ def main() -> None:
     save_source_sequence_plot(plot_path, values)
     save_stage_2_summary(stage_2_summary_path, values)
 
+    autocorrelations = calculate_autocorrelations(values)
+    confidence_bound = 1.96 / sqrt(len(values))
+    autocorrelation_table_path = args.out_dir / "tables" / "stage_3_autocorrelation.csv"
+    autocorrelation_plot_path = args.out_dir / "plots" / "source_autocorrelation.png"
+    stage_3_summary_path = args.out_dir / "stage_3_summary.txt"
+    save_source_autocorrelations(autocorrelation_table_path, autocorrelations)
+    save_autocorrelation_plot(
+        autocorrelation_plot_path,
+        autocorrelations,
+    )
+    save_stage_3_summary(stage_3_summary_path, autocorrelations, confidence_bound)
+
     writer = csv.writer(sys.stdout, delimiter="\t")
     writer.writerows(build_form1_rows(results))
     print(f"\nТаблица сохранена: {table_path}")
     print(f"Итог для n = 300 сохранён: {summary_path}")
     print(f"График исходной последовательности сохранён: {plot_path}")
     print(f"Итог второго этапа сохранён: {stage_2_summary_path}")
+    print(f"Автокорреляции сохранены: {autocorrelation_table_path}")
+    print(f"График автокорреляции сохранён: {autocorrelation_plot_path}")
+    print(f"Итог третьего этапа сохранён: {stage_3_summary_path}")
 
 
 if __name__ == "__main__":

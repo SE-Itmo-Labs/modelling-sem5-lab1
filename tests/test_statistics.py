@@ -5,6 +5,8 @@ import pytest
 
 from src.data_io import load_sequence
 from src.statistics import (
+    autocorrelation,
+    calculate_autocorrelations,
     calculate_characteristics,
     calculate_for_sample_sizes,
     relative_deviation,
@@ -52,3 +54,18 @@ def test_wrong_variant_is_rejected(tmp_path: Path) -> None:
 
     with pytest.raises(ValueError, match="Ожидался вариант 29"):
         load_sequence(path)
+
+
+def test_autocorrelation_for_alternating_sequence() -> None:
+    values = np.array([1.0, -1.0, 1.0, -1.0])
+
+    assert autocorrelation(values, 1) == pytest.approx(-0.75)
+    assert autocorrelation(values, 2) == pytest.approx(0.5)
+
+
+def test_variant_29_autocorrelations() -> None:
+    values = load_sequence(ROOT / "data" / "29_data.txt")
+    result = calculate_autocorrelations(values)
+
+    assert tuple(result) == tuple(range(1, 11))
+    assert result[1] == pytest.approx(0.0168839649)
