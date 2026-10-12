@@ -109,7 +109,6 @@ def generate_hyperexponential(
     size: int,
     seed: int,
 ) -> np.ndarray:
-    """Generate an H2 sample by phase selection and inverse transformation."""
     if size < 1:
         raise ValueError("Размер последовательности должен быть положительным.")
 
