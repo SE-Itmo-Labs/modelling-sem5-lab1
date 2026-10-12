@@ -11,9 +11,11 @@
 
   show figure.caption: set text(style: "italic")
 
-  figure(
-    box(width: width, body),
-    caption: caption,
-    supplement: supplement,
-  )
+  block(above: 4pt, below: 8pt)[
+    #figure(
+      box(width: width, body),
+      caption: caption,
+      supplement: supplement,
+    )
+  ]
 }

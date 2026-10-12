@@ -1,6 +1,6 @@
 from math import sqrt
 from pathlib import Path
-from typing import NamedTuple
+from typing import Generator, NamedTuple
 
 import numpy as np
 from scipy.stats import t
@@ -70,7 +70,7 @@ def relative_deviation(value: float, reference: float) -> float:
 
 def autocorrelation(values: np.ndarray, lag: int) -> float:
     centered = values - np.mean(values)
-    # Знаменатель общий для всех сдвигов и соответствует формуле из отчёта.
+    # Знаменатель общий для всех сдвигов и соответствует формуле из отчёта
     return float(np.sum(centered[:-lag] * centered[lag:]) / np.sum(centered**2))
 
 
@@ -81,7 +81,7 @@ def autocorrelations(values: np.ndarray) -> dict[int, float]:
 def empirical_moments(values: np.ndarray) -> dict[str, float]:
     mean = float(np.mean(values))
     second_moment = float(np.mean(values**2))
-    # В методе моментов используется делитель n, а не выборочная дисперсия с n - 1.
+    # В методе моментов используется делитель n, а не выборочная дисперсия с n - 1
     variance = second_moment - mean**2
     return {
         "mean": mean,
@@ -127,10 +127,12 @@ def h2_density(values: np.ndarray, parameters: H2Parameters) -> np.ndarray:
 
 
 def generate_values(parameters: H2Parameters) -> np.ndarray:
-    generator = np.random.default_rng(SEED)
+
+    generator : Generator = np.random.default_rng(SEED) # задаем значения по сиду
     phase_numbers = generator.random(VALUES_COUNT)
     value_numbers = generator.random(VALUES_COUNT)
-    # Первое число выбирает фазу, второе преобразуется в экспоненциальную величину.
+
+    # Первое число выбирает фазу, второе преобразуется в экспоненциальную величину
     phase_means = np.where(phase_numbers < parameters.q, parameters.t1, parameters.t2)
     return -phase_means * np.log1p(-value_numbers)
 

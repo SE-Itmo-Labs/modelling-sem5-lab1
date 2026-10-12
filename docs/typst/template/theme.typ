@@ -17,7 +17,7 @@
   page-margin: 20mm,
   paragraph-indent: 1.25cm,
   paragraph-leading: 0.7em,
-  paragraph-spacing: 0.8em,
+  paragraph-spacing: 1em,
 
   // Размеры блочного и встроенного кода.
   code-size: 10pt,

@@ -45,7 +45,7 @@
   // Заголовки не нумеруются, но автоматически попадают в содержание.
   set heading(numbering: none)
 
-  set figure(gap: 8pt)
+  set figure(gap: 10pt)
   show figure.caption: set text(size: 11pt)
 
   // H1 — заголовок основного раздела, по центру.
@@ -67,7 +67,7 @@
     width: 100%,
     above: 0pt,
     below: 0pt,
-    inset: (top: 14pt, bottom: 10pt),
+    inset: (top: 16pt, bottom: 14pt),
     breakable: false,
   )[
     #set par(first-line-indent: 0pt, justify: false)
@@ -79,7 +79,7 @@
     width: 100%,
     above: 0pt,
     below: 0pt,
-    inset: (top: 10pt, bottom: 7pt),
+    inset: (top: 16pt, bottom: 11pt),
     breakable: false,
   )[
     #set par(first-line-indent: 0pt, justify: false)

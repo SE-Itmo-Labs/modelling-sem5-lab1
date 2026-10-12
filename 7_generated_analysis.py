@@ -103,7 +103,7 @@ def run() -> None:
         h2_density(x_values, parameters),
         color="#c23b22",
         linewidth=1.8,
-        label="Плотность H₂",
+        label="Плотность H_2",
     )
     axis.set(xlabel="Значение", ylabel="Плотность", xlim=(0, x_values[-1]))
     axis.grid(axis="y", alpha=0.25)
