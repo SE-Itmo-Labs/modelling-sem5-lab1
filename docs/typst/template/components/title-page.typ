@@ -1,4 +1,4 @@
-// Композиция титульного листа. Данные берутся из config.typ, а размеры —
+// Композиция титульного листа. Данные берутся из config.typ, а размеры -
 // из theme.typ. Значения v(...) задают вертикальные расстояния между блоками.
 #let title-page(config: (:), theme: (:)) = {
   set text(font: config.font_family, size: theme.body-size, lang: "ru")

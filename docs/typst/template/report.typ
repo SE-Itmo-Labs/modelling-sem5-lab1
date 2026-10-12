@@ -48,7 +48,7 @@
   set figure(gap: 10pt)
   show figure.caption: set text(size: 11pt)
 
-  // H1 — заголовок основного раздела, по центру.
+  // H1 - заголовок основного раздела, по центру.
   show heading.where(level: 1): it => block(
     width: 100%,
     above: 0pt,
@@ -62,7 +62,7 @@
     ]
   ]
 
-  // H2 — крупный подраздел, выровнен влево.
+  // H2 - крупный подраздел, выровнен влево.
   show heading.where(level: 2): it => block(
     width: 100%,
     above: 0pt,
@@ -74,7 +74,7 @@
     #text(size: theme.heading-2-size, weight: "bold")[#it.body]
   ]
 
-  // H3 — вложенный подраздел с меньшими отступами.
+  // H3 - вложенный подраздел с меньшими отступами.
   show heading.where(level: 3): it => block(
     width: 100%,
     above: 0pt,
