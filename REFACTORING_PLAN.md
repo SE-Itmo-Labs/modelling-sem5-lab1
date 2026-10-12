@@ -20,20 +20,17 @@
 
 ```text
 main.py
-src/
-  common.py
-  stage1_statistics.py
-  stage2_sequence_plot.py
-  stage3_autocorrelation.py
-  stage4_histogram.py
-  stage5_distribution.py
-  stage6_generator.py
-  stage7_generated_analysis.py
-  stage8_comparison.py
+lab_common.py
+1_statistics.py
+2_sequence_plot.py
+3_autocorrelation.py
+4_histogram.py
+5_distribution.py
+6_generator.py
+7_generated_analysis.py
+8_comparison.py
 tests/
-  test_statistics.py
-  test_distribution.py
-  test_full_run.py
+  test_lab.py
 ```
 
 Каждый файл этапа содержит функцию `run()` и обычную точку входа:
@@ -50,7 +47,7 @@ if __name__ == "__main__":
 Благодаря этому возможны оба варианта запуска:
 
 ```bash
-python -m src.stage3_autocorrelation
+python 3_autocorrelation.py
 python main.py
 ```
 
@@ -61,7 +58,7 @@ python main.py
 
 Аргументы командной строки для этой работы не нужны. Из `main.py` следует
 удалить `argparse`, а известные значения записать как константы в
-`src/common.py`:
+`lab_common.py`:
 
 ```python
 VARIANT = 29
@@ -94,7 +91,7 @@ GENERATED_SIZE = 300
 Проверки должны быть короткими: правильный номер варианта, ровно 300 конечных
 неотрицательных чисел. Возможность передать другой вариант не нужна.
 
-### `stage1_statistics.py`
+### `1_statistics.py`
 
 - среднее, несмещённая дисперсия, СКО и коэффициент вариации;
 - доверительные интервалы;
@@ -104,7 +101,7 @@ GENERATED_SIZE = 300
 Формулы располагаются рядом с этапом, а не прячутся за большим количеством
 универсальных функций и строковых ключей.
 
-### `stage2_sequence_plot.py`
+### `2_sequence_plot.py`
 
 - чтение исходных данных;
 - построение одной ломаной исходной последовательности;
@@ -113,21 +110,21 @@ GENERATED_SIZE = 300
 Отдельный текстовый файл с выводом второго этапа не создавать: тот же вывод
 уже присутствует в отчёте.
 
-### `stage3_autocorrelation.py`
+### `3_autocorrelation.py`
 
 - одна функция расчёта автокорреляции;
 - расчёт сдвигов 1–10;
 - CSV-таблица и график-ломаная;
 - вывод о сравнении с границей `±1.96 / sqrt(300)`.
 
-### `stage4_histogram.py`
+### `4_histogram.py`
 
 - 18 интервалов по правилу `ceil(sqrt(n))`;
 - интервальный ряд в CSV;
 - гистограмма частот;
 - короткий вывод в терминал.
 
-### `stage5_distribution.py`
+### `5_distribution.py`
 
 - расчёт начальных моментов;
 - обоснование выбора закона `H2` по коэффициенту вариации;
@@ -138,7 +135,7 @@ GENERATED_SIZE = 300
 Текущий класс с несколькими свойствами можно убрать, если после рефакторинга он
 не делает код понятнее.
 
-### `stage6_generator.py`
+### `6_generator.py`
 
 - получение `q`, `t1`, `t2` из этапа 5;
 - генерация 300 значений методом обратного преобразования;
@@ -148,7 +145,7 @@ GENERATED_SIZE = 300
 изображение следует перенести в ресурсы отчёта, после чего удалить код
 построения блок-схемы из `plots.py`.
 
-### `stage7_generated_analysis.py`
+### `7_generated_analysis.py`
 
 - загрузка либо воспроизводимая генерация последовательности с `seed = 29`;
 - форма 2;
@@ -160,7 +157,7 @@ GENERATED_SIZE = 300
 Проще всего каждый раз повторять детерминированную генерацию, а не требовать
 наличия промежуточного файла.
 
-### `stage8_comparison.py`
+### `8_comparison.py`
 
 - форма 3;
 - коэффициент корреляции Пирсона;

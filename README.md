@@ -1,23 +1,24 @@
 # УИР 1 по моделированию
 
-Расчёты выполняются для варианта 29.
+вариант 29
 
-## Первый этап
-
-Запуск расчёта характеристик исходной последовательности:
+Полный расчёт запускается командой:
 
 ```bash
 python main.py
 ```
 
-Программа рассчитывает характеристики для первых 10, 20, 50, 100, 200 и 300 значений и сохраняет:
-
-- `results/tables/form1.csv` — форму 1 из задания;
-- `results/stage1_summary.txt` — итоговые значения для полной выборки.
-
-Проверка расчётов:
+Каждый этап можно запустить отдельно:
 
 ```bash
-pytest
+python 1_statistics.py
+python 2_sequence_plot.py
+python 3_autocorrelation.py
+python 4_histogram.py
+python 5_distribution.py
+python 6_generator.py
+python 7_generated_analysis.py
+python 8_comparison.py
 ```
- 
+
+Таблицы и графики сохраняются в `results`
