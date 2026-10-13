@@ -43,8 +43,10 @@ def draw_plot(values: dict[int, float], path) -> None:
 def run() -> None:
     values = load_values()
     coefficients = autocorrelations(values)
+
     TABLES_DIR.mkdir(parents=True, exist_ok=True)
     PLOTS_DIR.mkdir(parents=True, exist_ok=True)
+
     rows = [
         ["Сдвиг ЧП", *map(str, LAGS)],
         [
@@ -52,12 +54,16 @@ def run() -> None:
             *(format_number(coefficients[lag]) for lag in LAGS),
         ],
     ]
+
     with (TABLES_DIR / "stage_3_autocorrelation.csv").open(
         "w", encoding="utf-8-sig", newline=""
     ) as file:
         csv.writer(file, delimiter=";").writerows(rows)
+
     draw_plot(coefficients, PLOTS_DIR / "source_autocorrelation.png")
+
     bound = 1.96 / sqrt(len(values))
+    
     print(f"3. Все коэффициенты автокорреляции находятся в границах ±{bound:.6f}.")
 
 
