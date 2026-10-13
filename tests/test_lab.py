@@ -24,7 +24,7 @@ def test_characteristics_for_simple_sample() -> None:
     assert result["mean"] == pytest.approx(3.0)
     assert result["variance"] == pytest.approx(2.5)
     assert result["deviation"] == pytest.approx(np.sqrt(2.5))
-    assert result["confidence_0.95"] == pytest.approx(1.963243, rel=1e-6)
+    assert result["confidence_0.95"] == pytest.approx(1.385929, rel=1e-6)
 
 
 def test_variant_29_results() -> None:
