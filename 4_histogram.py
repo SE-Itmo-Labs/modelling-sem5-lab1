@@ -36,6 +36,14 @@ def run() -> None:
         edgecolor="#202020",
         linewidth=0.8,
     )
+    axis.set_xticks(boundaries)
+    axis.set_xticklabels(
+        [f"{value:.1f}" for value in boundaries],
+        rotation=45,
+        ha="right",
+        fontsize=7,
+    )
+    axis.grid(axis="x", alpha=0.25)
     axis.set(
         xlabel="Значение",
         ylabel="Частота",

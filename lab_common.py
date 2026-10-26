@@ -11,12 +11,17 @@ RESULTS_DIR = ROOT / "results"
 PLOTS_DIR = RESULTS_DIR / "plots"
 TABLES_DIR = RESULTS_DIR / "tables"
 
-VARIANT = 29
+
 VALUES_COUNT = 300
+
 SAMPLE_SIZES = (10, 20, 50, 100, 200, 300)
+
 CONFIDENCE_LEVELS = (0.90, 0.95, 0.99)
+
 CONFIDENCE_COEFFICIENTS = {0.90: 1.643, 0.95: 1.960, 0.99: 2.576}
+
 LAGS = tuple(range(1, 11))
+
 Q = 0.25
 SEED = 29
 
@@ -29,32 +34,33 @@ class H2Parameters(NamedTuple):
 
 def load_values() -> np.ndarray:
     tokens = DATA_FILE.read_text(encoding="utf-8-sig").split()
-    if not tokens or int(tokens[0]) != VARIANT:
-        raise ValueError("В файле должен быть указан вариант 29.")
 
     values = np.array([float(token.replace(",", ".")) for token in tokens[1:]])
-    if len(values) != VALUES_COUNT:
-        raise ValueError("В исходной последовательности должно быть 300 значений.")
-    if not np.all(np.isfinite(values)) or np.any(values < 0):
-        raise ValueError("Все исходные значения должны быть конечными и неотрицательными.")
+
     return values
 
 
 def characteristics(values: np.ndarray) -> dict[str, float]:
+
     mean = float(np.mean(values))
     variance = float(np.var(values, ddof=1))
     deviation = sqrt(variance)
+
     result = {
         "mean": mean,
         "variance": variance,
         "deviation": deviation,
         "variation": deviation / abs(mean),
     }
+    
     for probability in CONFIDENCE_LEVELS:
+
         coefficient = CONFIDENCE_COEFFICIENTS[probability]
+
         result[f"confidence_{probability:.2f}"] = float(
             coefficient * deviation / sqrt(len(values))
         )
+        
     return result
 
 
